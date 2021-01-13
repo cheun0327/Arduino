@@ -55,6 +55,13 @@ void setup()
 }
 void loop() 
 {
+  if (Serial.available() > 0) //시리얼 통신
+  {
+    char data = Serial.read();
+    Serial.println("XXXXXXX  END XXXXXXX");
+    if (data == 'x')          //x 입력이 탈출조건
+      while(true);            //무한 루프에 같혀서 종료 효과
+  }
   potentio_loop();    //가변저항 level 3이상이면 주차장 종료(노래로 알림)
   Dht_loop();         //온습도가 너무 높으면 주차장 운영 중지(차단기 안열림)
   Jodo_loop();        //주차여부 판단
@@ -204,6 +211,7 @@ void LCD_loop()
   else      //주차장 이용이 어려울 때(온습도 영향)
   {
     lcd.clear();
+    lcd.setCursor(0, 0);
     lcd.print("  UNAVAILABLE  ");
     lcd.setCursor(4, 1);
     lcd.write(byte(0));
@@ -268,9 +276,9 @@ void servoUp()
     tone(piezo, openSong[i], songTime[i]);
     delay(songTime[i]);
   }
-  while (angle <= 100)    //차단기 올림
+  while (angle >= 0)    //차단기 올림
   {
-    servo.write(angle++);
+    servo.write(angle--);
     delay(15); 
    }
 }
@@ -282,9 +290,9 @@ void servoDown()
     tone(piezo, closeSong[i], songTime[i]);
     delay(songTime[i]);
   }
-  while (angle >= 0)      //차단기 내림
+  while (angle <= 100)      //차단기 내림
   {
-    servo.write(angle--);
+    servo.write(angle++);
     delay(15); 
   }
 }
